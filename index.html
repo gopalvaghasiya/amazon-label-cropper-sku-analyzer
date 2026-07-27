@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon PDF Label Cropper & SKU Analyzer</title>
+    <meta name="description" content="Crop Amazon shipping label PDFs and generate SKU-wise order reports instantly. A secure, 100% client-side tool for Amazon sellers.">
+    <meta name="keywords" content="Amazon label cropper, Amazon SKU analyzer, shipping label crop, Amazon seller tool, PDF label crop, ATSPL, order quantity calculator">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Third Party Scripts -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: rgba(22, 26, 37, 0.65);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #ff9900; /* Amazon Orange */
+            --primary-glow: rgba(255, 153, 0, 0.4);
+            --secondary: #146eb4; /* Amazon Blue */
+            --secondary-glow: rgba(20, 110, 180, 0.4);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 153, 0, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(20, 110, 180, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff9900 0%, #146eb4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .main-container {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed rgba(255, 153, 0, 0.3);
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 153, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(255, 153, 0, 0.06);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .drop-zone-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .drop-zone:hover .drop-zone-icon {
+            transform: translateY(-5px);
+        }
+
+        .drop-zone p {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .drop-zone span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-label span.value {
+            color: var(--primary);
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+
+        /* Custom Slider styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+            transition: transform 0.1s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, #e68a00 100%);
+            color: #0b0c10;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+            filter: brightness(1.1);
+        }
+
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+
+        /* Status & Alert badge */
+        .status-badge {
+            display: none;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-badge.loading {
+            display: flex;
+            background: rgba(20, 110, 180, 0.15);
+            border: 1px solid rgba(20, 110, 180, 0.2);
+            color: #4da3ff;
+        }
+        .status-badge.success {
+            display: flex;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+            max-width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* Table Design */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: rgba(10, 12, 16, 0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--card-border);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            color: var(--text-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sku-cell {
+            font-family: monospace;
+            font-weight: 600;
+            color: #4da3ff;
+            font-size: 0.95rem;
+        }
+
+        .qty-cell {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .total-row {
+            background: rgba(255, 153, 0, 0.05) !important;
+            font-weight: 700;
+        }
+
+        .total-row td {
+            border-top: 1px solid rgba(255, 153, 0, 0.2);
+            color: var(--text-main);
+        }
+
+        /* Previews Grid */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .preview-card {
+            background: rgba(10, 12, 16, 0.4);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .preview-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 153, 0, 0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .preview-canvas-wrapper {
+            width: 100%;
+            aspect-ratio: 0.7; /* Standard portrait shape of Amazon label */
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .preview-canvas-wrapper canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .preview-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .preview-info span.page-number {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            opacity: 0.3;
+        }
+        .sku-cell {
+            font-family: monospace;
+            font-weight: 600;
+            color: #4da3ff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: underline dotted;
+        }
+
+        .sku-cell:hover {
+            color: var(--primary);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .customer-list {
+            list-style: none;
+            max-height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-right: 0.5rem;
+        }
+
+        .customer-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .order-id-badge {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Amazon Label Cropper & SKU Analyzer</h1>
+        <p>Upload your Amazon PDF containing both shipping labels and tax invoices. We'll automatically filter out the invoices and compile a SKU-wise order report.</p>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar Panel -->
+        <div class="glass-panel" style="display: flex; flex-direction: column; gap: 1.5rem; height: fit-content;">
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">📥</div>
+                <p>Drag & drop PDF here</p>
+                <span>or click to browse files</span>
+                <input type="file" id="fileInput" class="file-input" accept="application/pdf">
+            </div>
+
+            <div class="status-badge" id="statusBadge">
+                <div class="spinner"></div>
+                <span id="statusText">Processing label...</span>
+            </div>
+
+            <div class="controls-panel">
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Label Cutoff Height</span>
+                        <span class="value" id="heightVal">100%</span>
+                    </div>
+                    <input type="range" id="cropHeightSlider" min="30" max="100" value="100" disabled>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Adjust percentage of vertical space kept from the top. 100% keeps the full label page.</span>
+                </div>
+
+                <button class="btn" id="downloadBtn" disabled>
+                    <span>⚡</span> Download Clean Labels PDF
+                </button>
+                
+                <button class="btn btn-secondary" id="resetBtn" disabled>
+                    Reset Tool
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Panel -->
+        <div class="glass-panel dashboard-content">
+            <!-- Reports Section -->
+            <div class="report-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        SKU-wise Summary Report
+                    </div>
+                    <input type="text" class="search-bar" id="searchBar" placeholder="Search SKU..." disabled>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SKU Name</th>
+                                <th>Quantity</th>
+                                <th>Total Orders</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody">
+                            <tr>
+                                <td colspan="3">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">📊</div>
+                                        <div>Upload a PDF to view the SKU reports here</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--card-border);">
+
+            <!-- PDF Previews Section -->
+            <div class="preview-section">
+                <div class="section-title">
+                    Shipping Labels Preview (Invoices Removed)
+                </div>
+                <div class="preview-grid" id="previewGrid">
+                    <div class="empty-state" style="grid-column: 1 / -1; width: 100%;">
+                        <div class="empty-state-icon">👁️</div>
+                        <div>Page previews will be generated here</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for showing customer names -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Customers for SKU</div>
+                <button class="modal-close-btn" id="closeModal">&times;</button>
+            </div>
+            <ul class="customer-list" id="customerList">
+                <!-- Populated dynamically -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>
