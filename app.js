@@ -218,13 +218,14 @@ async function parsePDF(pdfData) {
                 }
             }
             
-            // 1. Extract SKUs: Look for ASIN ( Seller SKU ) format
+            // 1. Extract SKUs: Look for ASIN ( Seller SKU ) format in raw text stream
+            // to avoid horizontal table column merging issues (like IGST joining the SKU)
+            const rawFullText = textContent.items.map(it => it.str).join(" ");
             const skuRegex = /[B0-9][A-Z0-9]{9}\s*\(\s*([^)]+)\s*\)/gi;
             const skusFound = [];
             let match;
-            while ((match = skuRegex.exec(fullText)) !== null) {
-                const rawSku = match[1].trim();
-                const cleanSku = rawSku.split(/\s+/).pop();
+            while ((match = skuRegex.exec(rawFullText)) !== null) {
+                const cleanSku = match[1].trim();
                 skusFound.push(cleanSku);
             }
             
