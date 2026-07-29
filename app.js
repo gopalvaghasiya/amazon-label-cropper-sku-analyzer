@@ -287,17 +287,17 @@ async function extractLabelPages(pdfBytes, pageIndexes, invoicePageSkus) {
                 x: 40,
                 y: boxY,
                 width: width - 80,
-                height: 25,
+                height: 30,
                 color: PDFLib.rgb(1, 1, 1),
             });
             
-            // Draw bold SKU list text in red inside the blank space
+            // Draw bold SKU list text in black inside the blank space with larger font (size 18)
             page.drawText(`SKU: ${skuText}`, {
                 x: 45,
-                y: boxY + 7,
-                size: 11,
+                y: boxY + 8,
+                size: 18,
                 font: boldFont,
-                color: PDFLib.rgb(1, 0, 0), // Bold Red for high visibility
+                color: PDFLib.rgb(0, 0, 0), // Black color for thermal print readability
             });
         }
         
