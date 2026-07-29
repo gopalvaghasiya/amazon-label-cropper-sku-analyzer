@@ -282,7 +282,8 @@ async function extractLabelPages(pdfBytes, pageIndexes, invoicePageSkus) {
             const skuText = skus.map(s => `${s.sku} (x${s.qty})`).join(", ");
             const { width, height } = page.getSize();
             // Draw a protective white rectangle in the bottom-middle blank space (above route boxes)
-            const boxY = height * 0.21;
+            // Shifted slightly down to avoid overlapping the table border above
+            const boxY = height * 0.195;
             page.drawRectangle({
                 x: 40,
                 y: boxY,
