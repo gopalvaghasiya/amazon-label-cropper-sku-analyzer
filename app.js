@@ -281,23 +281,23 @@ async function extractLabelPages(pdfBytes, pageIndexes, invoicePageSkus) {
         if (skus && skus.length > 0) {
             const skuText = skus.map(s => `${s.sku} (x${s.qty})`).join(", ");
             const { width, height } = page.getSize();
-            
-            // Draw a protective white rectangle at the top of the label page
+            // Draw a protective white rectangle in the bottom-middle blank space (above route boxes)
+            const boxY = height * 0.21;
             page.drawRectangle({
-                x: 10,
-                y: height - 32,
-                width: width - 20,
-                height: 22,
+                x: 40,
+                y: boxY,
+                width: width - 80,
+                height: 25,
                 color: PDFLib.rgb(1, 1, 1),
             });
             
-            // Draw bold SKU list text on top of the rectangle
+            // Draw bold SKU list text in red inside the blank space
             page.drawText(`SKU: ${skuText}`, {
-                x: 15,
-                y: height - 26,
-                size: 10,
+                x: 45,
+                y: boxY + 7,
+                size: 11,
                 font: boldFont,
-                color: PDFLib.rgb(0, 0, 0),
+                color: PDFLib.rgb(1, 0, 0), // Bold Red for high visibility
             });
         }
         
