@@ -109,7 +109,7 @@ async function handleFile(file) {
         
         showLoading('Filtering out invoices...');
         // Create a new PDF with only label pages
-        cleanLabelPdfBytes = await extractLabelPages(currentPdfBytes.slice(0), parsed.labelPageIndexes);
+        cleanLabelPdfBytes = await extractLabelPages(currentPdfBytes.slice(0), parsed.labelPageIndexes, parsed.invoicePageSkus);
         
         // Default cutoff is 100% (uncropped labels)
         croppedPdfBytes = cleanLabelPdfBytes.slice(0);
@@ -174,6 +174,7 @@ async function parsePDF(pdfData) {
     
     const labelPageIndexes = []; // 0-based indexes for pdfDoc
     const skuMap = {};
+    const invoicePageSkus = {}; // maps invoicePageIndex -> array of {sku, qty}
     
     // Process each page
     for (let i = 1; i <= numPages; i++) {
@@ -236,10 +237,13 @@ async function parsePDF(pdfData) {
                 qtysFound.push(parseInt(match[1], 10));
             }
             
+            const pageSkus = [];
             // Map SKUs to quantities and associate with the Customer Name and Order ID
             for (let j = 0; j < skusFound.length; j++) {
                 const sku = skusFound[j];
                 const qty = qtysFound[j] !== undefined ? qtysFound[j] : 1; // fallback to 1 if no quantity matches
+                
+                pageSkus.push({ sku, qty });
                 
                 if (!skuMap[sku]) {
                     skuMap[sku] = { qty: 0, orders: 0, customers: [] };
@@ -253,19 +257,50 @@ async function parsePDF(pdfData) {
                     orderId: orderId
                 });
             }
+            invoicePageSkus[i - 1] = pageSkus; // 0-based page index
         }
     }
     
-    return { labelPageIndexes, skuMap };
+    return { labelPageIndexes, skuMap, invoicePageSkus };
 }
 
-// Extract only label pages into a new PDF using PDF-lib
-async function extractLabelPages(pdfBytes, pageIndexes) {
+// Extract only label pages into a new PDF using PDF-lib and draw SKU details on them
+async function extractLabelPages(pdfBytes, pageIndexes, invoicePageSkus) {
     const srcDoc = await PDFLib.PDFDocument.load(pdfBytes);
     const newDoc = await PDFLib.PDFDocument.create();
     
+    const boldFont = await newDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
     const copiedPages = await newDoc.copyPages(srcDoc, pageIndexes);
-    for (const page of copiedPages) {
+    
+    for (let idx = 0; idx < copiedPages.length; idx++) {
+        const page = copiedPages[idx];
+        const labelPageIndex = pageIndexes[idx];
+        const invoicePageIndex = labelPageIndex + 1; // invoice is the next page
+        
+        const skus = invoicePageSkus[invoicePageIndex];
+        if (skus && skus.length > 0) {
+            const skuText = skus.map(s => `${s.sku} (x${s.qty})`).join(", ");
+            const { width, height } = page.getSize();
+            
+            // Draw a protective white rectangle at the top of the label page
+            page.drawRectangle({
+                x: 10,
+                y: height - 32,
+                width: width - 20,
+                height: 22,
+                color: PDFLib.rgb(1, 1, 1),
+            });
+            
+            // Draw bold SKU list text on top of the rectangle
+            page.drawText(`SKU: ${skuText}`, {
+                x: 15,
+                y: height - 26,
+                size: 10,
+                font: boldFont,
+                color: PDFLib.rgb(0, 0, 0),
+            });
+        }
+        
         newDoc.addPage(page);
     }
     
