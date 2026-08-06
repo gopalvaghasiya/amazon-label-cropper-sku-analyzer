@@ -107,9 +107,24 @@ async function handleFile(file) {
         
         renderSKUTable(skuData);
         
-        showLoading('Filtering out invoices...');
-        // Create a new PDF with only label pages
-        cleanLabelPdfBytes = await extractLabelPages(currentPdfBytes.slice(0), parsed.labelPageIndexes, parsed.invoicePageSkus);
+        showLoading('Filtering out invoices & sorting by SKU...');
+        
+        // Sort label pages alphabetically by SKU name
+        const labelPageDetails = parsed.labelPageIndexes.map(labelIdx => {
+            const invoiceIdx = labelIdx + 1;
+            const skus = parsed.invoicePageSkus[invoiceIdx] || [];
+            const skuSortKey = skus.map(s => s.sku).sort().join(", ") || "";
+            return {
+                labelPageIndex: labelIdx,
+                skuSortKey: skuSortKey
+            };
+        });
+        
+        labelPageDetails.sort((a, b) => a.skuSortKey.localeCompare(b.skuSortKey));
+        const sortedLabelPageIndexes = labelPageDetails.map(item => item.labelPageIndex);
+        
+        // Create a new PDF with only label pages, sorted by SKU
+        cleanLabelPdfBytes = await extractLabelPages(currentPdfBytes.slice(0), sortedLabelPageIndexes, parsed.invoicePageSkus);
         
         // Default cutoff is 100% (uncropped labels)
         croppedPdfBytes = cleanLabelPdfBytes.slice(0);
