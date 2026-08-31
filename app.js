@@ -566,3 +566,28 @@ function resetApp() {
         </div>
     `;
 }
+
+// Privacy & Terms Modal Handlers for AdSense Compliance
+const privacyBtn = document.getElementById('privacyBtn');
+const privacyModal = document.getElementById('privacyModal');
+const closePrivacyModal = document.getElementById('closePrivacyModal');
+
+const termsBtn = document.getElementById('termsBtn');
+const termsModal = document.getElementById('termsModal');
+const closeTermsModal = document.getElementById('closeTermsModal');
+
+if (privacyBtn && privacyModal && closePrivacyModal) {
+    privacyBtn.addEventListener('click', () => privacyModal.classList.add('active'));
+    closePrivacyModal.addEventListener('click', () => privacyModal.classList.remove('active'));
+    privacyModal.addEventListener('click', (e) => {
+        if (e.target === privacyModal) privacyModal.classList.remove('active');
+    });
+}
+
+if (termsBtn && termsModal && closeTermsModal) {
+    termsBtn.addEventListener('click', () => termsModal.classList.add('active'));
+    closeTermsModal.addEventListener('click', () => termsModal.classList.remove('active'));
+    termsModal.addEventListener('click', (e) => {
+        if (e.target === termsModal) termsModal.classList.remove('active');
+    });
+}
