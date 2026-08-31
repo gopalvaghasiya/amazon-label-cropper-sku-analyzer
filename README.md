@@ -1,5 +1,7 @@
 # Amazon Label Cropper & SKU-wise Report Analyzer
 
+🔗 **Live Tool**: [https://gopalvaghasiya.github.io/amazon-label-cropper-sku-analyzer/](https://gopalvaghasiya.github.io/amazon-label-cropper-sku-analyzer/)
+
 A secure, high-performance, and **100% client-side web tool** designed for Amazon Sellers to streamline their packaging and shipping workflow. 
 
 This tool allows you to upload your bundled Amazon Shipping Label + Tax Invoice PDFs, automatically separates and discards the invoice pages, crops/resizes the shipping labels for thermal printers, and compiles a clean, real-time SKU-wise summary report of your daily orders.
@@ -8,6 +10,7 @@ This tool allows you to upload your bundled Amazon Shipping Label + Tax Invoice 
 
 ## 🚀 Key Features
 
+* **Direct Thermal Printing**: Print clean shipping label stickers directly to your thermal printer with a single click without having to download or open PDF files.
 * **Invoice Auto-Exclusion**: Automatically identifies and filters out Tax Invoice pages (which are text-selectable), leaving only the clean shipping labels in the final downloadable PDF.
 * **SKU-wise Summary Report**: Parses the invoice sheets to extract Amazon ASINs/Seller SKUs (e.g., `SD-MIX-1000`) and order quantities (`Qty`) to generate a dispatch summary table.
 * **Customer List Popup**: Click on any SKU name in the report table to open a popup showing a complete list of customers who ordered that item along with their Order IDs.
