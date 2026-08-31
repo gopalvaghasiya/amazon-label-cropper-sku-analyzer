@@ -15,6 +15,7 @@ const statusText = document.getElementById('statusText');
 const cropHeightSlider = document.getElementById('cropHeightSlider');
 const heightVal = document.getElementById('heightVal');
 const downloadBtn = document.getElementById('downloadBtn');
+const printBtn = document.getElementById('printBtn');
 const resetBtn = document.getElementById('resetBtn');
 const searchBar = document.getElementById('searchBar');
 const reportTableBody = document.getElementById('reportTableBody');
@@ -87,6 +88,50 @@ downloadBtn.addEventListener('click', () => {
     URL.revokeObjectURL(url);
 });
 
+// Print logic
+printBtn.addEventListener('click', () => {
+    const pdfToPrint = croppedPdfBytes || cleanLabelPdfBytes;
+    if (!pdfToPrint) return;
+    
+    const blob = new Blob([pdfToPrint], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create hidden iframe for direct printing
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.src = url;
+    
+    document.body.appendChild(iframe);
+    
+    iframe.onload = () => {
+        setTimeout(() => {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            } catch (e) {
+                console.error('Iframe print error, falling back to window.open', e);
+                const printWin = window.open(url, '_blank');
+                if (printWin) {
+                    printWin.focus();
+                    printWin.print();
+                }
+            }
+            // Cleanup iframe after a delay
+            setTimeout(() => {
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
+                }
+                URL.revokeObjectURL(url);
+            }, 60000);
+        }, 300);
+    };
+});
+
 // Search and filter logic
 searchBar.addEventListener('input', () => {
     renderSKUTable(skuData, searchBar.value.trim());
@@ -135,6 +180,7 @@ async function handleFile(file) {
         // Enable inputs & controls
         cropHeightSlider.disabled = false;
         downloadBtn.disabled = false;
+        printBtn.disabled = false;
         resetBtn.disabled = false;
         searchBar.disabled = false;
         
@@ -497,6 +543,7 @@ function resetApp() {
     cropHeightSlider.value = 100;
     heightVal.textContent = '100%';
     downloadBtn.disabled = true;
+    printBtn.disabled = true;
     resetBtn.disabled = true;
     searchBar.disabled = true;
     searchBar.value = '';

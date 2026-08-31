@@ -299,6 +299,31 @@
             box-shadow: none;
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            padding: 0.8rem 0.5rem;
+            font-size: 0.88rem;
+            white-space: nowrap;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, var(--secondary) 0%, #0d4b7a 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px var(--secondary-glow);
+        }
+
+        .btn-print:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--secondary-glow);
+            filter: brightness(1.1);
+        }
+
         /* Status & Alert badge */
         .status-badge {
             display: none;
@@ -680,9 +705,14 @@
                     <span style="font-size: 0.75rem; color: var(--text-muted);">Adjust percentage of vertical space kept from the top. 100% keeps the full label page.</span>
                 </div>
 
-                <button class="btn" id="downloadBtn" disabled>
-                    <span>⚡</span> Download Clean Labels PDF
-                </button>
+                <div class="action-buttons">
+                    <button class="btn" id="downloadBtn" disabled>
+                        <span>⚡</span> Download PDF
+                    </button>
+                    <button class="btn btn-print" id="printBtn" disabled>
+                        <span>🖨️</span> Print Labels
+                    </button>
+                </div>
                 
                 <button class="btn btn-secondary" id="resetBtn" disabled>
                     Reset Tool
@@ -755,6 +785,6 @@
     </div>
 
     <!-- Main Logic Script -->
-    <script src="app.js?v=1.7"></script>
+    <script src="app.js?v=1.8"></script>
 </body>
 </html>
