@@ -1,22 +1,37 @@
-# Amazon Label Cropper & SKU-wise Report Analyzer
+# E-Commerce Shipping Label Cropper & SKU Picklist Hub (Amazon, Meesho & Flipkart)
 
 🔗 **Live Tool**: [https://gopalvaghasiya.github.io/amazon-label-cropper-sku-analyzer/](https://gopalvaghasiya.github.io/amazon-label-cropper-sku-analyzer/)
 
-A secure, high-performance, and **100% client-side web tool** designed for Amazon Sellers to streamline their packaging and shipping workflow. 
+A secure, high-performance, and **100% client-side web tool** designed for **Amazon, Meesho & Flipkart/Shopsy Sellers** to streamline their packaging, shipping, and dispatch workflows through a single unified URL.
 
-This tool allows you to upload your bundled Amazon Shipping Label + Tax Invoice PDFs, automatically separates and discards the invoice pages, crops/resizes the shipping labels for thermal printers, and compiles a clean, real-time SKU-wise summary report of your daily orders.
+No need to open multiple websites or tools—switch seamlessly between **Amazon Portal**, **Meesho Portal**, and **Flipkart Portal** tabs, crop thermal shipping labels, filter tax invoices, generate SKU-wise dispatch picklists, and launch seller panels with 1 click.
 
 ---
 
 ## 🚀 Key Features
 
-* **Direct Thermal Printing**: Print clean shipping label stickers directly to your thermal printer with a single click without having to download or open PDF files.
-* **Invoice Auto-Exclusion**: Automatically identifies and filters out Tax Invoice pages (which are text-selectable), leaving only the clean shipping labels in the final downloadable PDF.
-* **SKU-wise Summary Report**: Parses the invoice sheets to extract Amazon ASINs/Seller SKUs (e.g., `SD-MIX-1000`) and order quantities (`Qty`) to generate a dispatch summary table.
-* **Customer List Popup**: Click on any SKU name in the report table to open a popup showing a complete list of customers who ordered that item along with their Order IDs.
-* **Robust Coordinate Filtering**: Uses PDF coordinate checking to isolate and display only customer names, preventing seller business names from appearing in reports.
-* **Dynamic Cutoff Height**: Crop label heights dynamically using an interactive slider (useful for adjusting margins for thermal barcode printing).
-* **100% Client-Side (Secure)**: All PDF processing, parsing, and rendering are done directly inside your browser. No files are uploaded to any server, keeping your customer data fully private and secure.
+### 📦 Amazon Portal
+* **Direct Thermal Printing**: Print clean Amazon shipping label stickers directly to your thermal printer with 1 click without downloading files.
+* **Invoice Auto-Exclusion**: Automatically identifies and filters out Tax Invoice pages, leaving only clean shipping labels in the final PDF.
+* **SKU-wise Summary Report**: Parses invoice sheets to extract Amazon ASINs/Seller SKUs (e.g. `SD-MIX-1000`) and order quantities (`Qty`) for dispatch.
+* **Customer List Breakdown**: Click any SKU name to open a popup with customer names and Amazon Order IDs.
+
+### 🛍️ Meesho Portal
+* **Meesho Label Processing**: Upload Meesho shipping label PDFs to automatically parse Sub-Order IDs, Product SKUs, Quantities, and Customer details.
+* **SKU Sort & Picklist**: Sorts Meesho labels alphabetically by SKU and compiles picklists for fast packing.
+* **Thermal Label Margin Cropper**: Adjust label cutoff height slider to fit 4x6 inch thermal roll formats.
+* **1-Click Thermal Print & PDF Download**: Send Meesho stickers straight to thermal printers (Zebra, Xprinter, TSC, etc.).
+
+### 🏷️ Flipkart & Shopsy Portal
+* **Automatic Invoice Cropper**: Automatically crops the top shipping label sticker from Flipkart/Shopsy A4 PDF sheets (default 48% height) and removes the bottom Tax Invoice half.
+* **SKU Extraction**: Extracts Flipkart Seller SKU ID (e.g. `SD-SANDALWOOD-250`), Description, and Total Qty.
+* **Order & Customer Breakdown**: Captures Flipkart Order IDs (`OD...`) and Customer names for the dispatch report.
+* **Thermal Print & Download**: Ready for standard 4x6 thermal barcode stickers.
+
+### 📑 All-in-One Multi-Portal Hub
+* **Tab-Wise Navigation**: Switch between Amazon, Meesho, and Flipkart workspaces on one URL with URL hash routing (`#amazon`, `#meesho`, `#flipkart`).
+* **Quick Seller Panel Launch**: Direct 1-click launch links for **Amazon Seller Central**, **Meesho Supplier Panel**, and **Flipkart Seller Hub**.
+* **100% Client-Side (Zero Server Uploads)**: All PDF parsing, text extraction, and cropping run entirely within your local browser. Customer and invoice data stay 100% private.
 
 ---
 
@@ -36,28 +51,20 @@ Since this application runs entirely in the browser and requires no server-side 
 
 1. **Initialize Git**:
    ```bash
-   git init
    git add .
-   git commit -m "Initial commit"
+   git commit -m "Add Flipkart portal tab and invoice cropper"
    ```
-2. **Add Remote & Push**:
+2. **Push to Remote**:
    ```bash
-   git remote add origin https://github.com/gopalvaghasiya/amazon-label-cropper-sku-analyzer.git
-   git branch -M main
-   git push -u origin main
+   git push origin main
    ```
-3. **Configure Pages**:
-   * Navigate to your repository settings on GitHub.
-   * Go to the **Pages** tab on the left sidebar.
-   * Under **Build and deployment**, select **Deploy from a branch**.
-   * Set the branch to `main` and the folder to `/ (root)`, then click **Save**.
-   * Your site will be live at `https://gopalvaghasiya.github.io/amazon-label-cropper-sku-analyzer/` within a couple of minutes!
+3. Your site will be live at `https://gopalvaghasiya.github.io/amazon-label-cropper-sku-analyzer/`!
 
 ---
 
 ## 💻 Running Locally
 
-You don't need any complex setup to run this tool locally. Just double-click the `index.html` file to open it in your browser, or serve it using XAMPP/Apache or the Live Server extension in VS Code.
+Open `index.html` directly in your web browser or serve it through your local XAMPP/Apache server (`http://localhost/Amzone_SKUwise_Report_And_Crop/`).
 
 ---
 
