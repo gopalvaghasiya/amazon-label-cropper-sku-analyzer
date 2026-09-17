@@ -542,15 +542,35 @@
 
         .action-buttons {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.5rem;
             width: 100%;
+            flex-wrap: wrap;
         }
 
         .action-buttons .btn {
-            flex: 1;
-            padding: 0.8rem 0.5rem;
-            font-size: 0.88rem;
+            flex: 1 1 calc(50% - 0.5rem);
+            min-width: 120px;
+            padding: 0.75rem 0.5rem;
+            font-size: 0.86rem;
             white-space: nowrap;
+        }
+
+        .action-buttons .btn-gsheet {
+            flex: 1 1 100%;
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        .btn-gsheet {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35) !important;
+        }
+
+        .btn-gsheet:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5) !important;
+            filter: brightness(1.1);
         }
 
         .btn-print {
@@ -1199,6 +1219,9 @@
         </div>
 
         <div class="quick-portal-links">
+            <button class="portal-link-btn" id="gsheetConfigBtn" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #34d399;" title="Configure Google Sheets Webhook">
+                <span>📊 Google Sheet Sync</span>
+            </button>
             <a href="https://sellercentral.amazon.in" target="_blank" rel="noopener" class="portal-link-btn" title="Open Amazon Seller Central">
                 <span>📦 Amazon Seller Central</span> ↗
             </a>
@@ -1250,6 +1273,9 @@
                         </button>
                         <button class="btn btn-print" id="printBtn" disabled>
                             <span>🖨️</span> Print Labels
+                        </button>
+                        <button class="btn btn-gsheet" id="amazonGsheetBtn" disabled>
+                            <span>📊</span> Save to Google Sheet
                         </button>
                     </div>
                     
@@ -1348,6 +1374,9 @@
                         <button class="btn btn-print" id="meeshoPrintBtn" disabled>
                             <span>🖨️</span> Print Labels
                         </button>
+                        <button class="btn btn-gsheet" id="meeshoGsheetBtn" disabled>
+                            <span>📊</span> Save to Google Sheet
+                        </button>
                     </div>
                     
                     <button class="btn btn-secondary" id="meeshoResetBtn" disabled>
@@ -1444,6 +1473,9 @@
                         </button>
                         <button class="btn btn-print" id="flipkartPrintBtn" disabled>
                             <span>🖨️</span> Print Labels
+                        </button>
+                        <button class="btn btn-gsheet" id="flipkartGsheetBtn" disabled>
+                            <span>📊</span> Save to Google Sheet
                         </button>
                     </div>
                     
@@ -1554,6 +1586,27 @@
         </div>
     </div>
 
+    <!-- Google Sheet Configuration Modal -->
+    <div class="modal-overlay" id="gsheetModal">
+        <div class="modal-box" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title" style="color: #10b981;">📊 Google Sheets Sync Setup</div>
+                <button class="modal-close-btn" id="closeGsheetModal">&times;</button>
+            </div>
+            <div class="modal-body-content">
+                <p>Sync your daily processed SKU dispatch count directly into your <strong>Sales Entry Daily</strong> Google Sheet in 1-click!</p>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Google Apps Script Webhook URL:</label>
+                    <input type="text" id="gsheetWebhookUrlInput" class="search-bar" style="max-width: 100%; width: 100%;" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+                <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                    <button class="btn btn-gsheet" id="saveGsheetWebhookBtn" style="flex: 1;">💾 Save Webhook URL</button>
+                    <button class="btn btn-secondary" id="testGsheetWebhookBtn">🧪 Test Connection</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Privacy Policy Modal -->
     <div class="modal-overlay" id="privacyModal">
         <div class="modal-box">
@@ -1583,6 +1636,6 @@
     </div>
 
     <!-- Main Logic Script -->
-    <script src="app.js?v=2.1"></script>
+    <script src="app.js?v=2.2"></script>
 </body>
 </html>
