@@ -1167,7 +1167,7 @@ const FlipkartPortal = (() => {
         });
     }
 
-    async function cropFlipkartTo4x6Thermal(pdfBytes, cropPercentage = 48, stickerBoxes = []) {
+    async function cropFlipkartTo4x6Thermal(pdfBytes, cropPercentage = 46, stickerBoxes = []) {
         const srcDoc = await PDFLib.PDFDocument.load(pdfBytes);
         const newDoc = await PDFLib.PDFDocument.create();
         const numPages = srcDoc.getPageCount();
@@ -1176,25 +1176,28 @@ const FlipkartPortal = (() => {
             const srcPage = srcDoc.getPage(i);
             const { width: srcW, height: srcH } = srcPage.getSize();
 
-            const userCutRatio = (cropPercentage || 48) / 100;
-            const bottomY = srcH * (1 - userCutRatio);
+            const userCutRatio = (cropPercentage || 46) / 100;
+            let bottomY = srcH * (1 - userCutRatio);
             
             let box = {
-                left: srcW * 0.175,
-                right: srcW * 0.825,
+                left: srcW * 0.165,
+                right: srcW * 0.835,
                 bottom: bottomY,
                 top: srcH * 0.985
             };
 
-            if (stickerBoxes[i]) {
+            if (stickerBoxes && stickerBoxes[i]) {
                 const auto = stickerBoxes[i];
-                box.left = Math.max(0, Math.min(box.left, auto.minX - 8));
-                box.right = Math.min(srcW, Math.max(box.right, auto.maxX + 8));
-                box.top = Math.min(srcH, Math.max(box.top, auto.maxY + 10));
+                if (auto.minX !== undefined && auto.maxX !== undefined) {
+                    box.left = auto.minX;
+                    box.right = auto.maxX;
+                    box.top = auto.maxY;
+                    box.bottom = Math.max(bottomY, auto.minY);
+                }
             }
 
-            const cropW = box.right - box.left;
-            const cropH = box.top - box.bottom;
+            const cropW = Math.max(50, box.right - box.left);
+            const cropH = Math.max(50, box.top - box.bottom);
 
             const embeddedPage = await newDoc.embedPage(srcPage, {
                 left: box.left,
@@ -1205,7 +1208,7 @@ const FlipkartPortal = (() => {
 
             const newPage = newDoc.addPage([THERMAL_4X6_WIDTH, THERMAL_4X6_HEIGHT]);
 
-            const margin = 4;
+            const margin = 6;
             const availW = THERMAL_4X6_WIDTH - (margin * 2);
             const availH = THERMAL_4X6_HEIGHT - (margin * 2);
 
@@ -1214,7 +1217,7 @@ const FlipkartPortal = (() => {
             const drawH = cropH * scale;
 
             const drawX = margin + (availW - drawW) / 2;
-            const drawY = THERMAL_4X6_HEIGHT - margin - drawH;
+            const drawY = margin + (availH - drawH) / 2;
 
             newPage.drawPage(embeddedPage, {
                 x: drawX,
@@ -1263,7 +1266,7 @@ const FlipkartPortal = (() => {
             currentPdfBytes = await sortedDoc.save();
             
             showLoading('Cropping & expanding sticker to 4x6 inch thermal roll format...');
-            const cropVal = parseInt(flipkartCropHeightSlider.value, 10) || 48;
+            const cropVal = parseInt(flipkartCropHeightSlider.value, 10) || 46;
             croppedPdfBytes = await cropFlipkartTo4x6Thermal(currentPdfBytes.slice(0), cropVal, pageStickerBoxes);
             
             showLoading('Generating 4x6 thermal previews...');
@@ -1302,24 +1305,61 @@ const FlipkartPortal = (() => {
             const pageH = pageView.height;
             const pageW = pageView.width;
             
-            const topHalfItems = textContent.items.filter(it => it.transform[5] > pageH * 0.45 && it.str.trim());
-            let minX = pageW * 0.18;
-            let maxX = pageW * 0.82;
-            let maxY = pageH * 0.98;
-            
-            if (topHalfItems.length > 0) {
-                const xs = topHalfItems.map(it => it.transform[4]).filter(x => x > 20 && x < pageW - 20);
-                const ys = topHalfItems.map(it => it.transform[5]).filter(y => y > pageH * 0.45);
-                if (xs.length > 0) {
-                    minX = Math.min(...xs);
-                    maxX = Math.max(...xs.map((x, idx) => x + (topHalfItems[idx].width || 40)));
+            // 1. Detect Tax Invoice header position vs Shipping label bottom markers
+            let taxInvoiceTopY = null;
+            let labelBottomMarkerY = null;
+
+            textContent.items.forEach(it => {
+                const str = it.str.trim();
+                const y = it.transform[5];
+                const h = it.height || 10;
+
+                if (/Tax\s*Invoice|Invoice\s*No|Bill\s*of\s*Supply/i.test(str) && y >= pageH * 0.40 && y <= pageH * 0.56) {
+                    if (taxInvoiceTopY === null || (y + h) > taxInvoiceTopY) {
+                        taxInvoiceTopY = y + h;
+                    }
                 }
-                if (ys.length > 0) {
-                    maxY = Math.max(...ys) + 15;
+
+                if (/Not\s*for\s*resale|Printed\s*at|Ordered\s*through/i.test(str) && y >= pageH * 0.48) {
+                    if (labelBottomMarkerY === null || y < labelBottomMarkerY) {
+                        labelBottomMarkerY = y;
+                    }
                 }
+            });
+
+            let calculatedBottomY = pageH * 0.54;
+            if (taxInvoiceTopY !== null) {
+                calculatedBottomY = Math.max(calculatedBottomY, taxInvoiceTopY + 12);
             }
-            
-            pageBoxes.push({ minX, maxX, maxY });
+            if (labelBottomMarkerY !== null) {
+                calculatedBottomY = Math.max(calculatedBottomY, labelBottomMarkerY - 6);
+            }
+
+            // 2. Isolate items that belong strictly to the top shipping label
+            const labelOnlyItems = textContent.items.filter(it => {
+                const y = it.transform[5];
+                const x = it.transform[4];
+                return y >= calculatedBottomY - 2 && it.str.trim() && x >= pageW * 0.05 && x <= pageW * 0.95;
+            });
+
+            let minX = pageW * 0.165;
+            let maxX = pageW * 0.835;
+            let maxY = pageH * 0.985;
+            let minY = calculatedBottomY;
+
+            if (labelOnlyItems.length > 0) {
+                const xs = labelOnlyItems.map(it => it.transform[4]);
+                const rightXs = labelOnlyItems.map(it => it.transform[4] + (it.width || 0));
+                const topYs = labelOnlyItems.map(it => it.transform[5] + (it.height || 0));
+                const ys = labelOnlyItems.map(it => it.transform[5]);
+
+                minX = Math.max(0, Math.min(...xs) - 6);
+                maxX = Math.min(pageW, Math.max(...rightXs) + 6);
+                maxY = Math.min(pageH, Math.max(...topYs) + 8);
+                minY = Math.max(calculatedBottomY, Math.min(...ys) - 4);
+            }
+
+            pageBoxes.push({ minX, maxX, minY, maxY });
             
             let orderId = `OD_PAGE_${i}`;
             const odMatch = fullText.match(/\b(OD\d{16,22})\b/i);
