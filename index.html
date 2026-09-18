@@ -1588,20 +1588,81 @@
 
     <!-- Google Sheet Configuration Modal -->
     <div class="modal-overlay" id="gsheetModal">
-        <div class="modal-box" style="max-width: 600px;">
+        <div class="modal-box" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
                 <div class="modal-title" style="color: #10b981;">📊 Google Sheets Sync Setup</div>
                 <button class="modal-close-btn" id="closeGsheetModal">&times;</button>
             </div>
             <div class="modal-body-content">
-                <p>Sync your daily processed SKU dispatch count directly into your <strong>Sales Entry Daily</strong> Google Sheet in 1-click!</p>
+                <p>Sync your daily processed SKU dispatch count directly into your <strong>Daily</strong> / <strong>Sales Entry Daily</strong> Google Sheet at the exact pending row (without skipping to the bottom)!</p>
+                
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                     <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Google Apps Script Webhook URL:</label>
                     <input type="text" id="gsheetWebhookUrlInput" class="search-bar" style="max-width: 100%; width: 100%;" placeholder="https://script.google.com/macros/s/.../exec">
                 </div>
+                
                 <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap;">
                     <button class="btn btn-gsheet" id="saveGsheetWebhookBtn" style="flex: 1;">💾 Save Webhook URL</button>
                     <button class="btn btn-secondary" id="testGsheetWebhookBtn">🧪 Test Connection</button>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--card-border); margin: 0.75rem 0;">
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-main);">Google Apps Script Code (Fix for Pending Rows):</span>
+                        <button class="footer-btn" id="copyScriptBtn" style="font-size: 0.8rem; color: #10b981;">📋 Copy Script Code</button>
+                    </div>
+                    <pre style="background: rgba(0,0,0,0.5); padding: 0.75rem; border-radius: 8px; font-size: 0.75rem; color: #a7f3d0; max-height: 180px; overflow: auto; border: 1px solid rgba(16,185,129,0.2);" id="scriptCodeBlock">function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // Find Daily / Sales Entry Daily sheet tab
+    var sheet = ss.getSheetByName("Daily") || ss.getSheetByName("Sales Entry Daily") || ss.getActiveSheet();
+    
+    // Column A (Date) indicates filled vs pending rows (Header is Row 9, data starts Row 10)
+    var startRow = 10;
+    var maxRows = sheet.getMaxRows();
+    var dateValues = sheet.getRange(startRow, 1, maxRows - startRow + 1, 1).getValues();
+    
+    // Find the first row where Date (Column A) is blank/pending
+    var firstEmptyRow = -1;
+    for (var i = 0; i < dateValues.length; i++) {
+      var val = dateValues[i][0];
+      if (val === "" || val === null || val === undefined) {
+        firstEmptyRow = startRow + i;
+        break;
+      }
+    }
+    
+    if (firstEmptyRow === -1) {
+      firstEmptyRow = maxRows + 1;
+    }
+    
+    var rows = data.rows; // [Date, Flavor, Pack Size, Qty Sold, Total GM, Seller, Remark]
+    
+    var neededRows = firstEmptyRow + rows.length - 1;
+    if (neededRows > sheet.getMaxRows()) {
+      sheet.insertRowsAfter(sheet.getMaxRows(), neededRows - sheet.getMaxRows());
+    }
+    
+    // Fill pending rows directly
+    sheet.getRange(firstEmptyRow, 1, rows.length, rows[0].length).setValues(rows);
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success",
+      count: rows.length,
+      insertedAtRow: firstEmptyRow
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}</pre>
                 </div>
             </div>
         </div>

@@ -304,7 +304,7 @@ async function syncSkuDataToGoogleSheet(skuDataMap, sellerName) {
             body: JSON.stringify({ rows: rows })
         });
         
-        alert(`✅ Success! ${rows.length} entries synced to Google Sheet ("Sales Entry Daily" Tab) successfully!`);
+        alert(`✅ Success! ${rows.length} entries synced to Google Sheet ("Daily" Tab) successfully!`);
     } catch (err) {
         console.error('Google Sheet Sync Error:', err);
         alert('Error syncing to Google Sheet: ' + err.message);
@@ -1648,9 +1648,26 @@ if (testGsheetWebhookBtn) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ rows: [testRow] })
             });
-            alert('✅ Test row sent! Check your "Sales Entry Daily" sheet in Google Docs.');
+            alert('✅ Test row sent! Check your "Daily" sheet in Google Docs.');
         } catch (e) {
             alert('Error connecting: ' + e.message);
+        }
+    });
+}
+
+if (copyScriptBtn) {
+    copyScriptBtn.addEventListener('click', () => {
+        const codeBlock = document.getElementById('scriptCodeBlock');
+        if (codeBlock) {
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                const origText = copyScriptBtn.textContent;
+                copyScriptBtn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    copyScriptBtn.textContent = origText;
+                }, 2000);
+            }).catch(() => {
+                alert('Could not auto-copy, please select and copy the code manually.');
+            });
         }
     });
 }
