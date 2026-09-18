@@ -164,6 +164,13 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
+        .tab-btn.active[data-tab="home"] {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(56, 189, 248, 0.22) 100%);
+            border-color: rgba(168, 85, 247, 0.45);
+            color: #c084fc;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.25);
+        }
+
         .tab-btn.active[data-tab="amazon"] {
             background: linear-gradient(135deg, rgba(255, 153, 0, 0.18) 0%, rgba(20, 110, 180, 0.18) 100%);
             border-color: rgba(255, 153, 0, 0.45);
@@ -1177,6 +1184,351 @@
             font-size: 0.92rem;
             line-height: 1.6;
         }
+
+        /* ========================================================================= */
+        /* HOME HUB & SEO GUIDE ACCORDION STYLING                                    */
+        /* ========================================================================= */
+        .home-theme h1 {
+            background: linear-gradient(135deg, #c084fc 0%, #38bdf8 50%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .home-hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1.1rem;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.85rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            border-radius: 999px;
+            font-size: 0.82rem;
+            color: var(--text-main);
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-pill span.dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+        }
+
+        /* Hub Portals Grid */
+        .hub-portals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            width: 100%;
+        }
+
+        .hub-portal-card {
+            background: rgba(18, 22, 33, 0.75);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(15px);
+        }
+
+        .hub-portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            opacity: 0.9;
+        }
+
+        .hub-portal-card.amazon-card::before {
+            background: linear-gradient(90deg, #ff9900, #146eb4);
+        }
+
+        .hub-portal-card.meesho-card::before {
+            background: linear-gradient(90deg, #f43397, #7928ca);
+        }
+
+        .hub-portal-card.flipkart-card::before {
+            background: linear-gradient(90deg, #2874f0, #ffc200);
+        }
+
+        .hub-portal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .hub-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .hub-portal-icon {
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            flex-shrink: 0;
+        }
+
+        .hub-portal-title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.25;
+        }
+
+        .hub-portal-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        .hub-portal-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            padding: 0.5rem 0;
+        }
+
+        .hub-portal-features li {
+            font-size: 0.86rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hub-portal-features li span.check {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .hub-launch-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .hub-launch-btn.amazon-btn {
+            background: linear-gradient(135deg, #ff9900 0%, #e68a00 100%);
+            color: #0b0c10;
+            box-shadow: 0 4px 15px rgba(255, 153, 0, 0.3);
+        }
+
+        .hub-launch-btn.amazon-btn:hover {
+            box-shadow: 0 6px 22px rgba(255, 153, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .hub-launch-btn.meesho-btn {
+            background: linear-gradient(135deg, #f43397 0%, #d81b7a 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(244, 51, 151, 0.3);
+        }
+
+        .hub-launch-btn.meesho-btn:hover {
+            box-shadow: 0 6px 22px rgba(244, 51, 151, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .hub-launch-btn.flipkart-btn {
+            background: linear-gradient(135deg, #2874f0 0%, #175ec7 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(40, 116, 240, 0.3);
+        }
+
+        .hub-launch-btn.flipkart-btn:hover {
+            box-shadow: 0 6px 22px rgba(40, 116, 240, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* SEO Guides Container & Accordion */
+        .seo-guides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .seo-guide-card {
+            background: rgba(14, 18, 27, 0.65);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 0.85rem;
+            transition: all 0.25s ease;
+        }
+
+        .seo-guide-card:hover {
+            border-color: rgba(255, 255, 255, 0.16);
+            background: rgba(16, 20, 31, 0.8);
+        }
+
+        .guide-top-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .guide-badge {
+            display: inline-block;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .guide-badge-amazon { background: rgba(255, 153, 0, 0.15); color: #ff9900; border: 1px solid rgba(255, 153, 0, 0.3); }
+        .guide-badge-meesho { background: rgba(244, 51, 151, 0.15); color: #f43397; border: 1px solid rgba(244, 51, 151, 0.3); }
+        .guide-badge-flipkart { background: rgba(40, 116, 240, 0.15); color: #60a5fa; border: 1px solid rgba(40, 116, 240, 0.3); }
+        .guide-badge-thermal { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .guide-badge-logistics { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+        .guide-read-time {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .guide-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.35;
+        }
+
+        .guide-summary {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        .view-more-content {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+        }
+
+        .view-more-content.expanded {
+            max-height: 3500px;
+            opacity: 1;
+            margin-top: 0.75rem;
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+
+        .guide-full-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            padding-top: 0.85rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            font-size: 0.88rem;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+
+        .guide-full-body h4 {
+            font-size: 0.95rem;
+            color: #f3f4f6;
+            font-weight: 700;
+            margin-top: 0.3rem;
+        }
+
+        .guide-full-body ul, .guide-full-body ol {
+            padding-left: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .guide-tip-box {
+            background: rgba(20, 110, 180, 0.1);
+            border-left: 3px solid #146eb4;
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.84rem;
+            color: #93c5fd;
+        }
+
+        .view-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 0.55rem 1rem;
+            border-radius: 10px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            align-self: flex-start;
+            margin-top: 0.5rem;
+        }
+
+        .view-more-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .view-more-arrow {
+            transition: transform 0.3s ease;
+            display: inline-block;
+            font-size: 0.7rem;
+        }
+
+        .view-more-btn.active .view-more-arrow {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
@@ -1184,7 +1536,11 @@
     <!-- Top Navigation Bar: Multi-Portal Switcher & Quick Launchers -->
     <div class="tabs-nav-container">
         <div class="tabs-nav">
-            <button class="tab-btn active" data-tab="amazon" id="tabBtnAmazon">
+            <button class="tab-btn active" data-tab="home" id="tabBtnHome">
+                <span class="tab-icon">🏠</span>
+                <span>Home Hub</span>
+            </button>
+            <button class="tab-btn" data-tab="amazon" id="tabBtnAmazon">
                 <span class="tab-icon">📦</span>
                 <span>Amazon Portal</span>
             </button>
@@ -1212,9 +1568,330 @@
     </div>
 
     <!-- ========================================================================= -->
+    <!-- HOME HUB PORTAL WORKSPACE                                                 -->
+    <!-- ========================================================================= -->
+    <div id="homePortal" class="portal-pane active">
+        <header class="home-theme">
+            <h1>E-Commerce Label Cropper & SKU Analyzer Hub</h1>
+            <p>High-speed, 100% private client-side utilities to crop 4x6 thermal shipping labels, filter out tax invoices, sort orders by SKU, and generate instant dispatch picklists for Amazon, Meesho, and Flipkart sellers.</p>
+            <div class="home-hero-badges">
+                <span class="hero-pill"><span class="dot"></span> 100% Client-Side (No Uploads)</span>
+                <span class="hero-pill">🔒 100% Private & Secure</span>
+                <span class="hero-pill">🖨️ 4x6 Thermal Printer Ready</span>
+                <span class="hero-pill">📊 Instant SKU Dispatch Reports</span>
+                <span class="hero-pill">⚡ Zero Latency & Offline Capable</span>
+            </div>
+        </header>
+
+        <!-- Marketplace Tool Launchers -->
+        <div class="hub-portals-grid">
+            <!-- Amazon Card -->
+            <div class="hub-portal-card amazon-card">
+                <div>
+                    <div class="hub-card-header">
+                        <div class="hub-portal-icon">📦</div>
+                        <div>
+                            <div class="hub-portal-title">Amazon Portal</div>
+                            <span style="font-size: 0.8rem; color: #ff9900; font-weight: 600;">Easy Ship & Self Ship</span>
+                        </div>
+                    </div>
+                    <p class="hub-portal-desc" style="margin-top: 0.85rem;">
+                        Automatically removes multi-page tax invoice sheets from Amazon PDFs, fits shipping labels to 4x6 thermal rolls, and compiles SKU-level order picklists.
+                    </p>
+                    <ul class="hub-portal-features" style="margin-top: 0.75rem;">
+                        <li><span class="check">✓</span> Auto Invoice Sheet Filtering</li>
+                        <li><span class="check">✓</span> Dynamic Label Cutoff Height Slider</li>
+                        <li><span class="check">✓</span> SKU-Wise Quantity Aggregator</li>
+                        <li><span class="check">✓</span> 1-Click Direct Thermal Print</li>
+                    </ul>
+                </div>
+                <button class="hub-launch-btn amazon-btn" data-launch="amazon">
+                    <span>Open Amazon Tool</span> &rarr;
+                </button>
+            </div>
+
+            <!-- Meesho Card -->
+            <div class="hub-portal-card meesho-card">
+                <div>
+                    <div class="hub-card-header">
+                        <div class="hub-portal-icon">🛍️</div>
+                        <div>
+                            <div class="hub-portal-title">Meesho Portal</div>
+                            <span style="font-size: 0.8rem; color: #f43397; font-weight: 600;">Single & Multi-Order</span>
+                        </div>
+                    </div>
+                    <p class="hub-portal-desc" style="margin-top: 0.85rem;">
+                        Extracts shipping labels and product SKUs from Meesho PDF batches. Groups multi-item orders and generates accurate warehouse picklists.
+                    </p>
+                    <ul class="hub-portal-features" style="margin-top: 0.75rem;">
+                        <li><span class="check">✓</span> Single & Bulk PDF Parsing</li>
+                        <li><span class="check">✓</span> Top Barcode & SKU Auto-Crop</li>
+                        <li><span class="check">✓</span> Customer & Order ID Mapping</li>
+                        <li><span class="check">✓</span> Zero Server Processing (Local Only)</li>
+                    </ul>
+                </div>
+                <button class="hub-launch-btn meesho-btn" data-launch="meesho">
+                    <span>Open Meesho Tool</span> &rarr;
+                </button>
+            </div>
+
+            <!-- Flipkart Card -->
+            <div class="hub-portal-card flipkart-card">
+                <div>
+                    <div class="hub-card-header">
+                        <div class="hub-portal-icon">🏷️</div>
+                        <div>
+                            <div class="hub-portal-title">Flipkart Portal</div>
+                            <span style="font-size: 0.8rem; color: #2874f0; font-weight: 600;">Flipkart & Shopsy</span>
+                        </div>
+                    </div>
+                    <p class="hub-portal-desc" style="margin-top: 0.85rem;">
+                        Crops the top 4x6 shipping label from Flipkart A4 sheets, removes the bottom tax invoice section, and groups FSN/SKUs into a clean dispatch summary.
+                    </p>
+                    <ul class="hub-portal-features" style="margin-top: 0.75rem;">
+                        <li><span class="check">✓</span> Top Shipping Label Half Auto-Crop</li>
+                        <li><span class="check">✓</span> Shopsy & Ekart Barcode Optimization</li>
+                        <li><span class="check">✓</span> SKU Dispatch Picklist Summary</li>
+                        <li><span class="check">✓</span> Instant Thermal Printing Ready</li>
+                    </ul>
+                </div>
+                <button class="hub-launch-btn flipkart-btn" data-launch="flipkart">
+                    <span>Open Flipkart Tool</span> &rarr;
+                </button>
+            </div>
+        </div>
+
+        <!-- SEO Guides and Knowledge Base Center with View More -->
+        <div class="glass-panel" style="margin-bottom: 2.5rem; padding: 2rem;">
+            <div class="section-header" style="margin-bottom: 1.5rem;">
+                <div>
+                    <h2 class="section-title" style="font-size: 1.45rem;">📚 E-Commerce Seller Guides & Thermal Label Knowledge Base</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">Expert guides on thermal label cropping, barcode optimization, invoice removal, and warehouse packing efficiency.</p>
+                </div>
+            </div>
+
+            <div class="seo-guides-grid">
+                <!-- Guide 1: Amazon -->
+                <div class="seo-guide-card">
+                    <div>
+                        <div class="guide-top-meta">
+                            <span class="guide-badge guide-badge-amazon">Amazon Easy Ship</span>
+                            <span class="guide-read-time">📖 4 min read</span>
+                        </div>
+                        <h3 class="guide-title">How to Crop Amazon Shipping Labels & Separate Tax Invoices for 4x6 Thermal Printers</h3>
+                        <p class="guide-summary">
+                            Amazon generates combined PDF files with shipping labels and full-page tax invoices. Learn how to isolate labels, remove tax invoices, and print barcode stickers on 4x6 thermal paper without wasting adhesive sheets.
+                        </p>
+                    </div>
+
+                    <div class="view-more-content collapsed" id="guide-amazon-content">
+                        <div class="guide-full-body">
+                            <h4>Why Do Amazon PDFs Include Tax Invoices?</h4>
+                            <p>When you download shipping labels from Amazon Seller Central under Easy Ship or Self Ship, Amazon bundles each customer's 4x6 shipping label alongside a full A4 tax invoice page. If you send the raw PDF directly to a 4x6 thermal roll printer, your printer will attempt to shrink the entire A4 invoice into a 4x6 sticker, resulting in unreadable barcodes and wasted expensive thermal rolls.</p>
+                            
+                            <h4>Step-by-Step Label Cropping Workflow:</h4>
+                            <ol>
+                                <li><strong>Download PDF:</strong> Download your daily dispatch batch from Amazon Seller Central (Manage Orders &rarr; Print Shipping Labels).</li>
+                                <li><strong>Upload to Hub:</strong> Drag & drop your PDF file into our <button class="footer-btn" data-launch="amazon" style="display:inline; text-decoration:underline;">Amazon Portal</button>.</li>
+                                <li><strong>Automatic Filtering:</strong> Our client-side algorithm instantly scans each page, identifies pure shipping labels with barcodes, and discards invoice-only pages.</li>
+                                <li><strong>Adjust Cutoff Height:</strong> If needed, use the cutoff height slider (default 100%) to trim unnecessary footer margins.</li>
+                                <li><strong>1-Click Thermal Print:</strong> Click "Print Labels" to print directly to your Zebra, Xprinter, or TVS thermal printer with zero dialog resizing.</li>
+                            </ol>
+
+                            <div class="guide-tip-box">
+                                💡 <strong>Pro Tip:</strong> Use the SKU Dispatch Report table on the right side to pick items in bulk before packing. This reduces packing station walking time by up to 60%.
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="view-more-btn" data-target="guide-amazon-content">
+                        <span class="view-more-text">Read Full Guide</span>
+                        <span class="view-more-arrow">&#9660;</span>
+                    </button>
+                </div>
+
+                <!-- Guide 2: Meesho -->
+                <div class="seo-guide-card">
+                    <div>
+                        <div class="guide-top-meta">
+                            <span class="guide-badge guide-badge-meesho">Meesho Logistics</span>
+                            <span class="guide-read-time">📖 3 min read</span>
+                        </div>
+                        <h3 class="guide-title">How to Crop Meesho Labels & Eliminate Packing Errors with Real-Time Picklists</h3>
+                        <p class="guide-summary">
+                            Learn how to process single and bulk Meesho PDF orders, extract clean customer barcodes, and aggregate product SKUs into an organized dispatch list to avoid wrong item dispatches.
+                        </p>
+                    </div>
+
+                    <div class="view-more-content collapsed" id="guide-meesho-content">
+                        <div class="guide-full-body">
+                            <h4>Challenges with Meesho Bulk Label PDFs</h4>
+                            <p>Meesho PDF labels often contain a mix of single-item and multi-quantity orders. Warehouse packers frequently misread tiny text lines printed on labels, leading to wrong item shipments, customer returns (RTO), and marketplace penalty charges.</p>
+                            
+                            <h4>How Our Meesho Cropper Solves This:</h4>
+                            <ul>
+                                <li><strong>Automated SKU Extraction:</strong> We parse product names, variation codes, and quantities directly from the PDF text layer.</li>
+                                <li><strong>Instant Picklist Creation:</strong> Get a summarized table showing exactly how many units of each SKU you need from your stock racks.</li>
+                                <li><strong>Customer Breakdown Modal:</strong> Click any SKU name to view all customer names and order IDs associated with that product.</li>
+                                <li><strong>4x6 Label Optimization:</strong> Auto-crops headers and trims margins to fit standard 100mm x 150mm adhesive thermal rolls perfectly.</li>
+                            </ul>
+
+                            <div class="guide-tip-box">
+                                💡 <strong>Quality Check:</strong> Ensure your thermal printer print speed is set to 4.0 inches/sec with density/darkness at 10-12 to prevent faded barcode scans at pickup.
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="view-more-btn" data-target="guide-meesho-content">
+                        <span class="view-more-text">Read Full Guide</span>
+                        <span class="view-more-arrow">&#9660;</span>
+                    </button>
+                </div>
+
+                <!-- Guide 3: Flipkart -->
+                <div class="seo-guide-card">
+                    <div>
+                        <div class="guide-top-meta">
+                            <span class="guide-badge guide-badge-flipkart">Flipkart & Shopsy</span>
+                            <span class="guide-read-time">📖 4 min read</span>
+                        </div>
+                        <h3 class="guide-title">Flipkart & Shopsy A4 PDF Cropping: How to Remove the Invoice Half Automatically</h3>
+                        <p class="guide-summary">
+                            Flipkart generates 2-in-1 A4 sheets with the shipping sticker on top and the customer invoice on the bottom. Discover how to isolate the top half into a crisp 4x6 label without using manual scissors.
+                        </p>
+                    </div>
+
+                    <div class="view-more-content collapsed" id="guide-flipkart-content">
+                        <div class="guide-full-body">
+                            <h4>The Flipkart 2-in-1 Label Problem</h4>
+                            <p>Flipkart Seller Hub and Shopsy generate dispatch labels formatted on standard A4 pages. The top half contains the courier routing barcode (Ekart, Shadowfax, Delhivery), while the bottom half contains the tax invoice. Sellers printing on thermal roll printers struggle because printing the full A4 page shrinks the barcode or requires manual cutting.</p>
+                            
+                            <h4>The Automated Cropping Solution:</h4>
+                            <ol>
+                                <li><strong>Upload Flipkart PDF:</strong> Upload single or batch Flipkart invoices into our <button class="footer-btn" data-launch="flipkart" style="display:inline; text-decoration:underline;">Flipkart Portal</button>.</li>
+                                <li><strong>Smart Coordinate Crop:</strong> The tool automatically clips the top 50% bounding box where the shipping label resides and converts it into a standalone 4x6 aspect ratio page.</li>
+                                <li><strong>Vector Fidelity:</strong> Labels are cropped mathematically using PDF vector operations—never converted to blurry low-res bitmap images.</li>
+                                <li><strong>Direct Print / Download:</strong> Print directly or download a clean batch PDF containing only ready-to-stick 4x6 labels.</li>
+                            </ol>
+
+                            <div class="guide-tip-box">
+                                💡 <strong>Ekart Compliance:</strong> Cropped labels maintain 100% sharp vector lines, ensuring 0% barcode rejection rates at the Ekart hub scan point.
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="view-more-btn" data-target="guide-flipkart-content">
+                        <span class="view-more-text">Read Full Guide</span>
+                        <span class="view-more-arrow">&#9660;</span>
+                    </button>
+                </div>
+
+                <!-- Guide 4: Thermal Printer Setup -->
+                <div class="seo-guide-card">
+                    <div>
+                        <div class="guide-top-meta">
+                            <span class="guide-badge guide-badge-thermal">Hardware & Setup</span>
+                            <span class="guide-read-time">📖 5 min read</span>
+                        </div>
+                        <h3 class="guide-title">Master Guide: Thermal Printer Setup (Zebra, Xprinter, TSC, TVS, Rollo)</h3>
+                        <p class="guide-summary">
+                            Learn the optimal driver configurations, paper size settings (4x6 inches / 100x150mm), and browser print parameters for crisp, scannable e-commerce shipping labels.
+                        </p>
+                    </div>
+
+                    <div class="view-more-content collapsed" id="guide-thermal-content">
+                        <div class="guide-full-body">
+                            <h4>Essential Thermal Printer Driver Configuration:</h4>
+                            <ul>
+                                <li><strong>Paper Size:</strong> Select <code>4.00 x 6.00 in</code> (or <code>100mm x 150mm</code> / <code>102mm x 152mm</code>). Do NOT leave it on Default A4.</li>
+                                <li><strong>Print Speed:</strong> Set between <code>3.0 ips</code> and <code>5.0 ips</code>. Higher speeds can create fuzzy 1D barcode lines.</li>
+                                <li><strong>Darkness / Density:</strong> Set to <code>8 - 12</code> (or <code>60% - 70%</code>). Avoid maximum darkness as it bleeds ink and connects thin barcode stripes.</li>
+                                <li><strong>Dithering / Halftone:</strong> Set to <code>None</code> or <code>Error Diffusion</code> for clean monochrome barcodes.</li>
+                            </ul>
+
+                            <h4>Browser Print Dialog Settings (Chrome / Edge):</h4>
+                            <ul>
+                                <li><strong>Destination:</strong> Select your thermal printer (e.g. <code>4BARCODE 4B-2054TF</code>, <code>Xprinter XP-420B</code>, <code>Zebra ZD220</code>).</li>
+                                <li><strong>Paper Size:</strong> 4x6 in / 100x150mm.</li>
+                                <li><strong>Margins:</strong> Set to <code>None</code>.</li>
+                                <li><strong>Scale:</strong> Set to <code>Fit to Printable Area</code> or <code>100%</code>.</li>
+                                <li><strong>Headers and Footers:</strong> Uncheck (prevents date/URL printing on stickers).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="view-more-btn" data-target="guide-thermal-content">
+                        <span class="view-more-text">Read Full Guide</span>
+                        <span class="view-more-arrow">&#9660;</span>
+                    </button>
+                </div>
+
+                <!-- Guide 5: Logistics & RTO Reduction -->
+                <div class="seo-guide-card">
+                    <div>
+                        <div class="guide-top-meta">
+                            <span class="guide-badge guide-badge-logistics">Warehouse SOP</span>
+                            <span class="guide-read-time">📖 4 min read</span>
+                        </div>
+                        <h3 class="guide-title">How SKU-Based Batch Picking Reduces Warehouse Packing Errors & Cuts RTO</h3>
+                        <p class="guide-summary">
+                            Discover the Standard Operating Procedure (SOP) used by high-volume marketplace sellers to pack 500+ orders per hour with zero mismatch returns.
+                        </p>
+                    </div>
+
+                    <div class="view-more-content collapsed" id="guide-logistics-content">
+                        <div class="guide-full-body">
+                            <h4>The Cost of Warehouse Dispatch Errors</h4>
+                            <p>Shipping the wrong color, size, or variant costs Indian e-commerce sellers between ₹80 to ₹180 in non-refundable forward + reverse logistics fees per return. Over 70% of packing mistakes happen when pickers try to pack one order at a time directly from raw multi-page PDF slips.</p>
+                            
+                            <h4>The 4-Step Zero-Error Packing SOP:</h4>
+                            <ol>
+                                <li><strong>Step 1 - Batch Pick List:</strong> Upload all orders into the tool and print or view the SKU summary table. Bring all items from the inventory racks in a single bulk round.</li>
+                                <li><strong>Step 2 - SKU Sorting:</strong> Organize items on the packing table grouped by SKU.</li>
+                                <li><strong>Step 3 - Sequential Packing:</strong> Because cropped labels are sorted in matching sequence, the packer attaches each 4x6 sticker directly onto the pre-sorted parcel.</li>
+                                <li><strong>Step 4 - Scan Verification:</strong> Perform a rapid handheld barcode scan check against the daily dispatch manifest before pickup handover.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <button class="view-more-btn" data-target="guide-logistics-content">
+                        <span class="view-more-text">Read Full Guide</span>
+                        <span class="view-more-arrow">&#9660;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frequently Asked Questions Accordion -->
+        <div class="glass-panel" style="margin-bottom: 2rem; padding: 2rem;">
+            <div class="section-header" style="margin-bottom: 1.5rem;">
+                <h2 class="section-title" style="font-size: 1.35rem;">❓ Frequently Asked Questions (FAQ)</h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">🔒 Is my customer invoice data safe when uploading to this tool?</div>
+                    <div class="faq-answer">Yes, 100%! All PDF parsing, invoice filtering, and label cropping happens entirely inside your web browser via client-side JavaScript (pdf-lib & PDF.js). No PDF files, customer details, addresses, or prices are ever uploaded to any server or third party.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">🖨️ Which thermal printers are supported?</div>
+                    <div class="faq-answer">All standard 4-inch (4x6 in / 100x150mm) direct thermal and thermal transfer barcode printers are supported, including Zebra, Xprinter, TSC, TVS, Dymo, Rollo, HPRT, Everycom, and Godex.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">⚡ Can I print shipping labels directly without downloading a PDF file?</div>
+                    <div class="faq-answer">Yes! Simply click the "Print Labels" button in any portal workspace. An optimized 4x6 print frame will open immediately, allowing you to print straight to your thermal printer with zero disk clutter.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">💰 Is this multi-marketplace tool completely free to use?</div>
+                    <div class="faq-answer">Yes! This utility is 100% free and open-source for all e-commerce sellers, warehouse managers, and logistics teams. There are no subscriptions, limits, or hidden fees.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
     <!-- AMAZON PORTAL WORKSPACE                                                   -->
     <!-- ========================================================================= -->
-    <div id="amazonPortal" class="portal-pane active">
+    <div id="amazonPortal" class="portal-pane">
         <header>
             <h1>Amazon Label Cropper & SKU Analyzer</h1>
             <p>Upload your Amazon PDF containing shipping labels and tax invoices. Automatically filter out invoice sheets, sort labels by SKU, and generate dispatch reports.</p>

@@ -8,16 +8,22 @@ const THERMAL_4X6_HEIGHT = 432;
 // =========================================================================
 // TAB NAVIGATION & ROUTING CONTROLLER
 // =========================================================================
+// =========================================================================
+// TAB NAVIGATION & ROUTING CONTROLLER
+// =========================================================================
+const tabBtnHome = document.getElementById('tabBtnHome');
 const tabBtnAmazon = document.getElementById('tabBtnAmazon');
 const tabBtnMeesho = document.getElementById('tabBtnMeesho');
 const tabBtnFlipkart = document.getElementById('tabBtnFlipkart');
+
+const homePortal = document.getElementById('homePortal');
 const amazonPortal = document.getElementById('amazonPortal');
 const meeshoPortal = document.getElementById('meeshoPortal');
 const flipkartPortal = document.getElementById('flipkartPortal');
 
 function setActiveTab(tabName, updateHash = true) {
-    [tabBtnAmazon, tabBtnMeesho, tabBtnFlipkart].forEach(btn => btn && btn.classList.remove('active'));
-    [amazonPortal, meeshoPortal, flipkartPortal].forEach(portal => portal && portal.classList.remove('active'));
+    [tabBtnHome, tabBtnAmazon, tabBtnMeesho, tabBtnFlipkart].forEach(btn => btn && btn.classList.remove('active'));
+    [homePortal, amazonPortal, meeshoPortal, flipkartPortal].forEach(portal => portal && portal.classList.remove('active'));
     document.body.classList.remove('meesho-active', 'flipkart-active');
 
     if (tabName === 'meesho') {
@@ -30,16 +36,61 @@ function setActiveTab(tabName, updateHash = true) {
         if (flipkartPortal) flipkartPortal.classList.add('active');
         document.body.classList.add('flipkart-active');
         if (updateHash) window.location.hash = 'flipkart';
-    } else {
+    } else if (tabName === 'amazon') {
         if (tabBtnAmazon) tabBtnAmazon.classList.add('active');
         if (amazonPortal) amazonPortal.classList.add('active');
         if (updateHash) window.location.hash = 'amazon';
+    } else {
+        // Default to Home Hub
+        if (tabBtnHome) tabBtnHome.classList.add('active');
+        if (homePortal) homePortal.classList.add('active');
+        if (updateHash) window.location.hash = 'home';
     }
 }
 
+if (tabBtnHome) tabBtnHome.addEventListener('click', () => setActiveTab('home'));
 if (tabBtnAmazon) tabBtnAmazon.addEventListener('click', () => setActiveTab('amazon'));
 if (tabBtnMeesho) tabBtnMeesho.addEventListener('click', () => setActiveTab('meesho'));
 if (tabBtnFlipkart) tabBtnFlipkart.addEventListener('click', () => setActiveTab('flipkart'));
+
+// Quick Launch Button Handlers from Home Hub
+document.addEventListener('click', (e) => {
+    const launchBtn = e.target.closest('[data-launch]');
+    if (launchBtn) {
+        e.preventDefault();
+        const targetPortal = launchBtn.getAttribute('data-launch');
+        if (targetPortal) {
+            setActiveTab(targetPortal);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+});
+
+// "View More / Read More" SEO Guide Accordion Expanders
+document.addEventListener('click', (e) => {
+    const viewMoreBtn = e.target.closest('.view-more-btn');
+    if (viewMoreBtn) {
+        e.preventDefault();
+        const targetId = viewMoreBtn.getAttribute('data-target');
+        const targetContent = document.getElementById(targetId);
+        const textSpan = viewMoreBtn.querySelector('.view-more-text');
+
+        if (!targetContent) return;
+
+        const isCurrentlyCollapsed = targetContent.classList.contains('collapsed');
+        if (isCurrentlyCollapsed) {
+            targetContent.classList.remove('collapsed');
+            targetContent.classList.add('expanded');
+            viewMoreBtn.classList.add('active');
+            if (textSpan) textSpan.textContent = 'Show Less';
+        } else {
+            targetContent.classList.remove('expanded');
+            targetContent.classList.add('collapsed');
+            viewMoreBtn.classList.remove('active');
+            if (textSpan) textSpan.textContent = 'Read Full Guide';
+        }
+    }
+});
 
 // Initial Tab Routing based on URL hash
 window.addEventListener('DOMContentLoaded', () => {
@@ -48,8 +99,10 @@ window.addEventListener('DOMContentLoaded', () => {
         setActiveTab('meesho', false);
     } else if (hash === 'flipkart') {
         setActiveTab('flipkart', false);
-    } else {
+    } else if (hash === 'amazon') {
         setActiveTab('amazon', false);
+    } else {
+        setActiveTab('home', false);
     }
 });
 
@@ -61,6 +114,8 @@ window.addEventListener('hashchange', () => {
         setActiveTab('flipkart', false);
     } else if (hash === 'amazon') {
         setActiveTab('amazon', false);
+    } else if (hash === 'home') {
+        setActiveTab('home', false);
     }
 });
 
