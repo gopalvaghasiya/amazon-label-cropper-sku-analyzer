@@ -5,9 +5,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 const THERMAL_4X6_WIDTH = 288;
 const THERMAL_4X6_HEIGHT = 432;
 
-// Default Verified Webhook URL
-const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwKv4I_yFoRYXqHBdCDQDEZkuMzsr0i8unVf-GMtBY9A195s4woPGrwRzu87gsYzY0bPQ/exec";
-
 // =========================================================================
 // TAB NAVIGATION & ROUTING CONTROLLER
 // =========================================================================
@@ -222,97 +219,6 @@ function printPDFBytes(pdfBytes) {
 
 
 // =========================================================================
-// GOOGLE SHEETS DAILY DISPATCH SYNC ENGINE
-// =========================================================================
-function parseSkuForGoogleSheet(skuName, rawQty, sellerName) {
-    const skuLower = (skuName || '').toLowerCase();
-    
-    // 1. Detect Gujarati Flavor Name
-    let flavor = skuName;
-    if (skuLower.includes('sandalwood') || skuLower.includes('chandan') || skuLower.includes('ચંદન')) {
-        flavor = 'ચંદન';
-    } else if (skuLower.includes('loban') || skuLower.includes('લોબાન')) {
-        flavor = 'લોબાન';
-    } else if (skuLower.includes('mogra') || skuLower.includes('મોગરા')) {
-        flavor = 'મોગરા';
-    } else if (skuLower.includes('mix') || skuLower.includes('મિક્સ')) {
-        flavor = 'મિક્સ ફ્લેવર';
-    } else if (skuLower.includes('rose') || skuLower.includes('gulab') || skuLower.includes('ગુલાબ')) {
-        flavor = 'ગુલાબ';
-    } else if (skuLower.includes('guggal') || skuLower.includes('guggul') || skuLower.includes('ગુગ્ગલ')) {
-        flavor = 'ગુગ્ગલ';
-    }
-    
-    // 2. Detect Pack Size and Grams
-    let packSize = '250 GM';
-    let grams = 250;
-    
-    if (skuLower.includes('1000') || skuLower.includes('1 kg') || skuLower.includes('1kg')) {
-        packSize = '1 KG';
-        grams = 1000;
-    } else if (skuLower.includes('500') || skuLower.includes('500 gm') || skuLower.includes('500gm')) {
-        packSize = '500 GM';
-        grams = 500;
-    } else if (skuLower.includes('250') || skuLower.includes('250 gm') || skuLower.includes('250gm')) {
-        packSize = '250 GM';
-        grams = 250;
-    } else if (skuLower.includes('100') || skuLower.includes('100 gm') || skuLower.includes('100gm')) {
-        packSize = '100 GM';
-        grams = 100;
-    }
-    
-    const qtySold = parseInt(rawQty, 10) || 1;
-    const totalGm = qtySold * grams;
-    
-    const now = new Date();
-    const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
-    
-    let seller = sellerName;
-    if (sellerName.toLowerCase().includes('meesho')) seller = 'Mesho';
-    else if (sellerName.toLowerCase().includes('amazon')) seller = 'Amazon';
-    else if (sellerName.toLowerCase().includes('flipkart')) seller = 'Flipkart';
-    
-    return [dateStr, flavor, packSize, qtySold, totalGm, seller, ''];
-}
-
-async function syncSkuDataToGoogleSheet(skuDataMap, sellerName) {
-    const webhookUrl = localStorage.getItem('gsheet_webhook_url') || DEFAULT_WEBHOOK_URL;
-    if (!webhookUrl) {
-        showGsheetModal();
-        alert('Please enter and save your Google Apps Script Webhook URL first.');
-        return;
-    }
-    
-    const skus = Object.keys(skuDataMap);
-    if (skus.length === 0) {
-        alert('No processed SKU data to sync. Please upload a PDF first.');
-        return;
-    }
-    
-    const rows = [];
-    skus.forEach(sku => {
-        const item = skuDataMap[sku];
-        const row = parseSkuForGoogleSheet(sku, item.qty, sellerName);
-        rows.push(row);
-    });
-    
-    try {
-        await fetch(webhookUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ rows: rows })
-        });
-        
-        alert(`✅ Success! ${rows.length} entries synced to Google Sheet ("Daily" Tab) successfully!`);
-    } catch (err) {
-        console.error('Google Sheet Sync Error:', err);
-        alert('Error syncing to Google Sheet: ' + err.message);
-    }
-}
-
-
-// =========================================================================
 // AMAZON PORTAL MODULE (4x6 Thermal Format)
 // =========================================================================
 const AmazonPortal = (() => {
@@ -329,7 +235,6 @@ const AmazonPortal = (() => {
     const heightVal = document.getElementById('heightVal');
     const downloadBtn = document.getElementById('downloadBtn');
     const printBtn = document.getElementById('printBtn');
-    const amazonGsheetBtn = document.getElementById('amazonGsheetBtn');
     const resetBtn = document.getElementById('resetBtn');
     const searchBar = document.getElementById('searchBar');
     const reportTableBody = document.getElementById('reportTableBody');
@@ -398,10 +303,6 @@ const AmazonPortal = (() => {
         printBtn.addEventListener('click', () => {
             printPDFBytes(croppedPdfBytes || cleanLabelPdfBytes);
         });
-
-        if (amazonGsheetBtn) {
-            amazonGsheetBtn.addEventListener('click', () => syncSkuDataToGoogleSheet(skuData, 'Amazon'));
-        }
 
         searchBar.addEventListener('input', () => {
             renderTable(skuData, searchBar.value.trim());
@@ -487,7 +388,6 @@ const AmazonPortal = (() => {
             cropHeightSlider.disabled = false;
             downloadBtn.disabled = false;
             printBtn.disabled = false;
-            if (amazonGsheetBtn) amazonGsheetBtn.disabled = false;
             resetBtn.disabled = false;
             searchBar.disabled = false;
             
@@ -704,7 +604,6 @@ const AmazonPortal = (() => {
         heightVal.textContent = '100%';
         downloadBtn.disabled = true;
         printBtn.disabled = true;
-        if (amazonGsheetBtn) amazonGsheetBtn.disabled = true;
         resetBtn.disabled = true;
         searchBar.disabled = true;
         searchBar.value = '';
@@ -748,7 +647,6 @@ const MeeshoPortal = (() => {
     const meeshoHeightVal = document.getElementById('meeshoHeightVal');
     const meeshoDownloadBtn = document.getElementById('meeshoDownloadBtn');
     const meeshoPrintBtn = document.getElementById('meeshoPrintBtn');
-    const meeshoGsheetBtn = document.getElementById('meeshoGsheetBtn');
     const meeshoResetBtn = document.getElementById('meeshoResetBtn');
     const meeshoSearchBar = document.getElementById('meeshoSearchBar');
     const meeshoReportTableBody = document.getElementById('meeshoReportTableBody');
@@ -816,10 +714,6 @@ const MeeshoPortal = (() => {
         meeshoPrintBtn.addEventListener('click', () => {
             printPDFBytes(croppedPdfBytes);
         });
-
-        if (meeshoGsheetBtn) {
-            meeshoGsheetBtn.addEventListener('click', () => syncSkuDataToGoogleSheet(skuData, 'Meesho'));
-        }
 
         meeshoSearchBar.addEventListener('input', () => {
             renderTable(skuData, meeshoSearchBar.value.trim());
@@ -909,7 +803,6 @@ const MeeshoPortal = (() => {
             meeshoCropHeightSlider.disabled = false;
             meeshoDownloadBtn.disabled = false;
             meeshoPrintBtn.disabled = false;
-            if (meeshoGsheetBtn) meeshoGsheetBtn.disabled = false;
             meeshoResetBtn.disabled = false;
             meeshoSearchBar.disabled = false;
             
@@ -1102,7 +995,6 @@ const MeeshoPortal = (() => {
         meeshoHeightVal.textContent = '100%';
         meeshoDownloadBtn.disabled = true;
         meeshoPrintBtn.disabled = true;
-        if (meeshoGsheetBtn) meeshoGsheetBtn.disabled = true;
         meeshoResetBtn.disabled = true;
         meeshoSearchBar.disabled = true;
         meeshoSearchBar.value = '';
@@ -1147,7 +1039,6 @@ const FlipkartPortal = (() => {
     const flipkartHeightVal = document.getElementById('flipkartHeightVal');
     const flipkartDownloadBtn = document.getElementById('flipkartDownloadBtn');
     const flipkartPrintBtn = document.getElementById('flipkartPrintBtn');
-    const flipkartGsheetBtn = document.getElementById('flipkartGsheetBtn');
     const flipkartResetBtn = document.getElementById('flipkartResetBtn');
     const flipkartSearchBar = document.getElementById('flipkartSearchBar');
     const flipkartReportTableBody = document.getElementById('flipkartReportTableBody');
@@ -1161,7 +1052,7 @@ const FlipkartPortal = (() => {
             e.preventDefault();
             flipkartDropZone.classList.add('dragover');
         });
-        flipkartDropZone.addEventListener('dragleave', () => flipkartDropZone.classList.remove('dragover'));
+        flipkartDropZone.addEventListener('dragleave', () => dropZone && dropZone.classList.remove('dragover'));
         flipkartDropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             flipkartDropZone.classList.remove('dragover');
@@ -1215,10 +1106,6 @@ const FlipkartPortal = (() => {
         flipkartPrintBtn.addEventListener('click', () => {
             printPDFBytes(croppedPdfBytes);
         });
-
-        if (flipkartGsheetBtn) {
-            flipkartGsheetBtn.addEventListener('click', () => syncSkuDataToGoogleSheet(skuData, 'Flipkart'));
-        }
 
         flipkartSearchBar.addEventListener('input', () => {
             renderTable(skuData, flipkartSearchBar.value.trim());
@@ -1331,7 +1218,6 @@ const FlipkartPortal = (() => {
             downloadBtn.disabled = false;
             flipkartDownloadBtn.disabled = false;
             flipkartPrintBtn.disabled = false;
-            if (flipkartGsheetBtn) flipkartGsheetBtn.disabled = false;
             flipkartResetBtn.disabled = false;
             flipkartSearchBar.disabled = false;
             
@@ -1562,7 +1448,6 @@ const FlipkartPortal = (() => {
         flipkartHeightVal.textContent = '48%';
         flipkartDownloadBtn.disabled = true;
         flipkartPrintBtn.disabled = true;
-        if (flipkartGsheetBtn) flipkartGsheetBtn.disabled = true;
         flipkartResetBtn.disabled = true;
         flipkartSearchBar.disabled = true;
         flipkartSearchBar.value = '';
@@ -1589,88 +1474,6 @@ const FlipkartPortal = (() => {
     return { init, reset };
 })();
 
-
-// =========================================================================
-// GOOGLE SHEET MODAL & SETUP HANDLERS
-// =========================================================================
-const gsheetConfigBtn = document.getElementById('gsheetConfigBtn');
-const gsheetModal = document.getElementById('gsheetModal');
-const closeGsheetModal = document.getElementById('closeGsheetModal');
-const gsheetWebhookUrlInput = document.getElementById('gsheetWebhookUrlInput');
-const saveGsheetWebhookBtn = document.getElementById('saveGsheetWebhookBtn');
-const testGsheetWebhookBtn = document.getElementById('testGsheetWebhookBtn');
-const copyScriptBtn = document.getElementById('copyScriptBtn');
-
-function showGsheetModal() {
-    if (gsheetModal) {
-        if (gsheetWebhookUrlInput) {
-            gsheetWebhookUrlInput.value = localStorage.getItem('gsheet_webhook_url') || DEFAULT_WEBHOOK_URL;
-        }
-        gsheetModal.classList.add('active');
-    }
-}
-
-function hideGsheetModal() {
-    if (gsheetModal) gsheetModal.classList.remove('active');
-}
-
-if (gsheetConfigBtn) gsheetConfigBtn.addEventListener('click', showGsheetModal);
-if (closeGsheetModal) closeGsheetModal.addEventListener('click', hideGsheetModal);
-if (gsheetModal) {
-    gsheetModal.addEventListener('click', (e) => {
-        if (e.target === gsheetModal) hideGsheetModal();
-    });
-}
-
-if (saveGsheetWebhookBtn) {
-    saveGsheetWebhookBtn.addEventListener('click', () => {
-        const url = gsheetWebhookUrlInput.value.trim();
-        if (!url) {
-            alert('Please paste a valid Google Webhook URL.');
-            return;
-        }
-        localStorage.setItem('gsheet_webhook_url', url);
-        alert('✅ Webhook URL saved successfully!');
-        hideGsheetModal();
-    });
-}
-
-if (testGsheetWebhookBtn) {
-    testGsheetWebhookBtn.addEventListener('click', async () => {
-        const url = gsheetWebhookUrlInput.value.trim() || DEFAULT_WEBHOOK_URL;
-        try {
-            const now = new Date();
-            const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
-            const testRow = [dateStr, 'ટેસ્ટ પ્રોડક્ટ', '250 GM', 1, 250, 'Test', 'Automated Test'];
-            await fetch(url, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ rows: [testRow] })
-            });
-            alert('✅ Test row sent! Check your "Daily" sheet in Google Docs.');
-        } catch (e) {
-            alert('Error connecting: ' + e.message);
-        }
-    });
-}
-
-if (copyScriptBtn) {
-    copyScriptBtn.addEventListener('click', () => {
-        const codeBlock = document.getElementById('scriptCodeBlock');
-        if (codeBlock) {
-            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
-                const origText = copyScriptBtn.textContent;
-                copyScriptBtn.textContent = '✅ Copied!';
-                setTimeout(() => {
-                    copyScriptBtn.textContent = origText;
-                }, 2000);
-            }).catch(() => {
-                alert('Could not auto-copy, please select and copy the code manually.');
-            });
-        }
-    });
-}
 
 // =========================================================================
 // PRIVACY & TERMS MODAL HANDLERS
